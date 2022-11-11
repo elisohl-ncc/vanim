@@ -1,6 +1,7 @@
 import vim  # type: ignore
 import os.path
 import ast
+from os import scandir, stat
 
 
 class Vanim:
@@ -40,10 +41,20 @@ class Vanim:
         prompt_command = r"echo \"Press Enter to close this window.\"; read" if preview else ""
         shell_command = f'sh -c "{manim_command}; {prompt_command}"'
         gnome_command = f"gnome-terminal --working-directory={self.cwd} -q -- {shell_command}"
-        vim_command = f"execute 'silent !{gnome_command}' | redraw!"
+        vim_command = f"execute 'silent !{gnome_command}' | sleep 1 | redraw!"
         # phew! that's a lot of commands!
         vim.command(vim_command)
 
     def render_all(self, quality="h"):
         for node in self._get_scene_nodes():
             self.render(quality, node.name, False)
+
+    def show(self):
+        video_dir = os.path.join("media", "videos", self.file[:-3])
+        video_subdirs = [dirent.name for dirent in scandir(video_dir)]
+        most_recent = max(
+            (video for subdir in video_subdirs if os.path.isfile(video := os.path.join(video_dir, subdir, self.scene + ".mp4"))),
+            key=lambda path: stat(path).st_mtime
+        )
+        vim_command = f"execute 'silent !vlc {most_recent}' | sleep 1 | redraw!"
+        vim.command(vim_command)

@@ -36,6 +36,7 @@ command! -nargs=? VanimRenderH :python3 vanim.render("h", <args>)
 command! -nargs=? VanimRenderP :python3 vanim.render("p", <args>)
 command! -nargs=? VanimRenderK :python3 vanim.render("k", <args>)
 command! -nargs=? VanimRenderAll :python3 vanim.render_all(<args>)
+command! -nargs=0 VanimShow :python3 vanim.show()
 
 " set a flag to indicate that this file has been run
 let g:vanim_plugin_loaded = 1
