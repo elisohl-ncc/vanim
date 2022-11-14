@@ -33,6 +33,9 @@ class Vanim:
                 continue
             yield node
 
+    def wrap_in_gnome_terminal(self, shell_command):
+        return f"gnome-terminal --working-directory={self.cwd} -q -- {shell_command}"
+
     def render(self, quality, scene=None, preview=True):
         scene = scene or self.scene
         assert scene is not None
@@ -40,8 +43,8 @@ class Vanim:
         manim_command = f"manim -{manim_flags} --save_sections {self.file} {scene}"
         prompt_command = r"echo \"Press Enter to close this window.\"; read" if preview else ""
         shell_command = f'sh -c "{manim_command}; {prompt_command}"'
-        gnome_command = f"gnome-terminal --working-directory={self.cwd} -q -- {shell_command}"
-        vim_command = f"execute 'silent !{gnome_command}' | sleep 1 | redraw!"
+        gnome_command = self.wrap_in_gnome_terminal(shell_command)
+        vim_command = f"execute 'silent !{gnome_command}' | redraw!"
         # phew! that's a lot of commands!
         vim.command(vim_command)
 
@@ -56,5 +59,6 @@ class Vanim:
             (video for subdir in video_subdirs if os.path.isfile(video := os.path.join(video_dir, subdir, self.scene + ".mp4"))),
             key=lambda path: stat(path).st_mtime
         )
-        vim_command = f"execute 'silent !vlc {most_recent}' | sleep 1 | redraw!"
+        gnome_command = self.wrap_in_gnome_terminal("vlc " + most_recent)
+        vim_command = f"execute 'silent !{gnome_command}' | redraw!"
         vim.command(vim_command)
