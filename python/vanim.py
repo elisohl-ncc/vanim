@@ -16,9 +16,19 @@ class Vanim:
     @property
     def scene(self):
         cur_line, _ = vim.current.window.cursor
-        for node in self._get_scene_nodes():
+        nodes = self._get_scene_nodes()
+        # look for a scene under the cursor
+        for node in nodes:
             if node.lineno <= cur_line <= node.end_lineno:
                 return node.name
+        # look for closest scene below the cursor
+        nodes_below = [node for node in nodes if node.lineno > cur_line]
+        if len(nodes_below) > 0:
+            return min(nodes_below, key=lambda node: node.lineno)
+        # look for closest scene above the cursor
+        nodes_above = [node for node in nodes if node.end_lineno < cur_line]
+        if len(nodes_above) > 0:
+            return max(nodes_above, key=lambda node: node.lineno)
         return None  # NOTE should this be an error?
 
     @staticmethod
