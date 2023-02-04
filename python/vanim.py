@@ -24,11 +24,11 @@ class Vanim:
         # look for closest scene below the cursor
         nodes_below = [node for node in nodes if node.lineno > cur_line]
         if len(nodes_below) > 0:
-            return min(nodes_below, key=lambda node: node.lineno)
+            return min(nodes_below, key=lambda node: node.lineno).name
         # look for closest scene above the cursor
         nodes_above = [node for node in nodes if node.end_lineno < cur_line]
         if len(nodes_above) > 0:
-            return max(nodes_above, key=lambda node: node.lineno)
+            return max(nodes_above, key=lambda node: node.lineno).name
         return None  # NOTE should this be an error?
 
     @staticmethod
