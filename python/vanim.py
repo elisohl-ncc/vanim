@@ -21,9 +21,6 @@ class Vanim:
         for node in nodes:
             if node.lineno <= cur_line <= node.end_lineno:
                 return node.name
-        # fuck it is there some other scene we can use?
-        if len(nodes) > 0:  # type: ignore
-            return nodes[0].name  # type: ignore
         return None  # NOTE should this be an error?
 
     @staticmethod
