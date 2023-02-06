@@ -25,7 +25,7 @@ class Vanim:
 
     @staticmethod
     def _get_scene_nodes():
-        source = '\n'.join(vim.current.buffer)  # pack entire buffer into a string lol
+        source = "\n".join(vim.current.buffer)  # pack entire buffer into a string lol
         parsed = ast.parse(source)
         for node in ast.walk(parsed):
             if not isinstance(node, ast.ClassDef):
