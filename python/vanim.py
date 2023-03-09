@@ -55,12 +55,19 @@ class Vanim:
             self.render(quality, node.name, False)
 
     def show(self):
-        video_dir = os.path.join("media", "videos", self.file[:-3])
-        video_subdirs = [dirent.name for dirent in scandir(video_dir)]
-        most_recent = max(
-            (video for subdir in video_subdirs if os.path.isfile(video := os.path.join(video_dir, subdir, self.scene + ".mp4"))),
-            key=lambda path: stat(path).st_mtime
-        )
-        gnome_command = self.wrap_in_gnome_terminal("vlc " + most_recent)
+        try:
+            most_recent = self._get_most_recent_render(".mp4")
+            gnome_command = self.wrap_in_gnome_terminal("vlc " + most_recent)
+        except ValueError:
+            most_recent = self._get_most_recent_render(".png")
+            gnome_command = self.wrap_in_gnome_terminal("eog " + most_recent)
         vim_command = f"execute 'silent !{gnome_command}' | redraw!"
         vim.command(vim_command)
+
+    def _get_most_recent_render(self, extension):
+        file_dir = os.path.join("media", "files", self.file[:-3])
+        file_subdirs = [dirent.name for dirent in scandir(file_dir)]
+        return max(
+            (file for subdir in file_subdirs if os.path.isfile(file := os.path.join(file_dir, subdir, self.scene + extension))),
+            key=lambda path: stat(path).st_mtime
+        )
