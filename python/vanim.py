@@ -66,6 +66,7 @@ class Vanim:
     def _get_files(self, folder, extension, subdirs=True):
         file_dir = os.path.join("media", folder, self.file[:-3])
         file_subdirs = [dirent.name for dirent in scandir(file_dir)] if subdirs else [file_dir]
+        with open("/tmp/foo", "w") as f: f.write(str(file_dir) + "\n" + str(file_subdirs))
         return tuple(
             file for subdir in file_subdirs
             if os.path.isfile(file := os.path.join(file_dir, subdir, self.scene + extension))
