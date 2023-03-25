@@ -79,6 +79,7 @@ class Vanim:
 
     def _get_image(self):
         file = os.path.join("media", "images", self.file[:-3], self.scene + MANIM_VERSION_SUFFIX + ".png")
+        with open("/tmp/foo", "w") as f: f.write(str(file))
         if os.path.isfile(file):
             return (file,)
         return ()
