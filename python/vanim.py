@@ -4,6 +4,12 @@ import ast
 from os import scandir, stat
 
 
+MANIM_VERSION_SUFFIX = "_v0.17.2"  # TODO FIXME this should not be hardcoded lol
+
+
+class VanimError(Exception): pass
+
+
 class Vanim:
     @property
     def cwd(self):
@@ -21,7 +27,7 @@ class Vanim:
         for node in nodes:
             if node.lineno <= cur_line <= node.end_lineno:
                 return node.name
-        return None  # NOTE should this be an error?
+        raise VanimError("no scene under cursor")
 
     @staticmethod
     def _get_scene_nodes():
@@ -55,7 +61,7 @@ class Vanim:
             self.render(quality, node.name, False)
 
     def show(self):
-        candidates = self._get_files("videos", ".mp4") + self._get_files("images", ".png", subdirs=False)
+        candidates = self._get_videos() + self._get_image()
         most_recent = max(candidates, key=lambda path: stat(path).st_mtime)
         viewer = "vlc " if most_recent.endswith(".mp4") else "eog "
         gnome_command = self.wrap_in_gnome_terminal(viewer + most_recent)
@@ -63,11 +69,16 @@ class Vanim:
         vim.command(vim_command)
         return [stat(path).st_mtime for path in candidates]
 
-    def _get_files(self, folder, extension, subdirs=True):
-        file_dir = os.path.join("media", folder, self.file[:-3])
-        file_subdirs = [dirent.name for dirent in scandir(file_dir)] if subdirs else [file_dir]
-        with open("/tmp/foo", "w") as f: f.write(str(file_dir) + "\n" + str(file_subdirs))
+    def _get_videos(self):
+        file_dir = os.path.join("media", "videos", self.file[:-3])
+        file_subdirs = [dirent.name for dirent in scandir(file_dir)]
         return tuple(
             file for subdir in file_subdirs
-            if os.path.isfile(file := os.path.join(file_dir, subdir, self.scene + extension))
+            if os.path.isfile(file := os.path.join(file_dir, subdir, self.scene + ".mp4"))
         )
+
+    def _get_image(self):
+        file = os.path.join("media", "images", self.file[:-3], self.scene + MANIM_VERSION_SUFFIX + ".png")
+        if os.path.isfile(file):
+            return (file,)
+        return ()
