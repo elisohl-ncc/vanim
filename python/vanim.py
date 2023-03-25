@@ -55,7 +55,7 @@ class Vanim:
             self.render(quality, node.name, False)
 
     def show(self):
-        candidates = self._get_files("videos", ".mp4") + self._get_files("images", ".png")
+        candidates = self._get_files("videos", ".mp4") + self._get_files("images", ".png", subdirs=False)
         most_recent = max(candidates, key=lambda path: stat(path).st_mtime)
         viewer = "vlc " if most_recent.endswith(".mp4") else "eog "
         gnome_command = self.wrap_in_gnome_terminal(viewer + most_recent)
@@ -63,7 +63,7 @@ class Vanim:
         vim.command(vim_command)
         return [stat(path).st_mtime for path in candidates]
 
-    def _get_files(self, folder, extension, subdirs=False):
+    def _get_files(self, folder, extension, subdirs=True):
         file_dir = os.path.join("media", folder, self.file[:-3])
         file_subdirs = [dirent.name for dirent in scandir(file_dir)] if subdirs else [file_dir]
         return tuple(
