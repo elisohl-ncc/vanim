@@ -4,7 +4,7 @@ import ast
 from os import scandir, stat
 
 
-MANIM_VERSION_SUFFIX = "_v0.17.2"  # TODO FIXME this should not be hardcoded lol
+MANIM_VERSION_SUFFIX = "_ManimCE_v0.17.2"  # TODO FIXME this should not be hardcoded lol
 
 
 class VanimError(Exception): pass
